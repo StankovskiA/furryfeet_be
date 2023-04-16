@@ -7,7 +7,7 @@ To setup the project, first create a virtual environment using the following com
 
 Then, activate the created env with the command
 
-    furryfeet_env/bin/activate  
+    furryfeet_env\Scripts\activate  
 
 Finally, run the following command to install all the needed dependencies that are needed for this project:
 
@@ -19,4 +19,4 @@ Before starting to work on the project, run the following command to apply all m
 
     python manage.py migrate
 
-For more info on Django, visit https://docs.djangoproject.com/en/4.2/ 
+For more info on Django, visit https://docs.djangoproject.com/en/4.2/
