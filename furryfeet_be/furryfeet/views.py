@@ -2,7 +2,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from .serializers import MyModelSerializer, UserSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import generics
+from rest_framework import generics, status
 from .models import MyModel, User
 
 from datetime import datetime, timedelta
@@ -78,3 +78,29 @@ class LogoutView(APIView):
         }
         
         return response
+
+class AddUserImageView(APIView):
+
+    def post(self, request, pk):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+          raise AuthenticationFailed("Unauthenticated!")
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        try:
+            if payload['id'] == pk:
+                user = User.objects.get(pk=pk)
+            else:
+                raise AuthenticationFailed("Unauthenticated!")
+        except User.DoesNotExist:
+            raise AuthenticationFailed("User not found!")
+        
+        user.image = request.data.get('image')
+        user.save()
+
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
