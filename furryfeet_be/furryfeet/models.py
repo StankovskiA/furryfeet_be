@@ -15,6 +15,7 @@ class User(AbstractUser):
     email = models.CharField(max_length=200, unique=True)
     password = models.CharField(max_length=20)
     joined_at = models.DateTimeField(auto_now_add=True)
+    image = models.URLField(null=True, blank=True)
     username = None
     
     USERNAME_FIELD = 'email'
