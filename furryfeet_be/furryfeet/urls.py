@@ -10,7 +10,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view()),
     path('user/', UserView.as_view()),
     path('user/<int:pk>/image/', AddUserImageView.as_view()),
-    path('dog-walker/', DogWalkerView.as_view(), name='dog-walker-get'),  # GET request to retrieve dog walker info, appointments and feedbacks
-    path('appointments/', AppointmentView.as_view(), name='appointment-get'),  # GET request to retrieve appointments
+    path('dog_walker/', DogWalkerView.as_view(), name='dog-walker-get'),  # GET request to retrieve dog walker info, appointments and feedbacks
+    path('appointments/<int:pk>', AppointmentView.as_view(), name='appointment-get'),  # GET request to retrieve appointments
     path('feedbacks/', FeedbackView.as_view(), name='feedback-get'),  # GET request to retrieve feedbacks
 ]

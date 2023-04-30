@@ -28,7 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
 class DogWalkerSerializer(serializers.ModelSerializer):
     class Meta:
         model = DogWalker
-        fields = '_all_'
+        fields = ['id']
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
