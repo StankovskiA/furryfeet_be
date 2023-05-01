@@ -1,9 +1,11 @@
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, render
 from rest_framework.exceptions import AuthenticationFailed
 from .serializers import MyModelSerializer, UserSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, status
-from .models import MyModel, User
+from .models import MyModel, User, Feedback, DogDetails
 
 from datetime import datetime, timedelta
 import jwt
@@ -104,3 +106,36 @@ class AddUserImageView(APIView):
 
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@login_required
+def feedback(request, dog_id):
+    # Get the dog details for the given id
+    dog = get_object_or_404(DogDetails, dog_id=dog_id)
+
+    if request.method == 'POST':
+        # If the form was submitted, create a new feedback object
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment')
+
+        feedback = Feedback(rating=rating, comment=comment,
+                            sender=request.user, receiver=dog.user)
+        feedback.save()
+
+    # Get all feedback objects for the given dog
+    feedbacks = Feedback.objects.filter(receiver=dog.user)
+
+    context = {
+        'dog': dog,
+        'feedbacks': feedbacks,
+    }
+    return render(request, 'feedback.html', context)
+
+def dog_details(request, dog_id):
+    # Get the dog details for the given id
+    dog = get_object_or_404(DogDetails, dog_id=dog_id)
+
+    context = {
+        'dog': dog,
+    }
+    return render(request, 'dog_details.html', context)
