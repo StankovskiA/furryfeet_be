@@ -20,3 +20,20 @@ class User(AbstractUser):
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+
+
+class DogWalker(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+
+
+class Appointment(models.Model):
+    date = models.DateTimeField()
+    dogOwner = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    dogWalker = models.ForeignKey(DogWalker, on_delete=models.CASCADE, null=False, related_name='appointments')
+
+
+class Feedback(models.Model):
+    rating = models.IntegerField()
+    comment = models.TextField(blank=True)
+    dogOwner = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    dogWalker = models.ForeignKey(DogWalker, on_delete=models.CASCADE, null=False, related_name='feedbacks')

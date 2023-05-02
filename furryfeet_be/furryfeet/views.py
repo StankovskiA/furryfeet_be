@@ -1,9 +1,9 @@
 from rest_framework.exceptions import AuthenticationFailed
-from .serializers import MyModelSerializer, UserSerializer
+from .serializers import MyModelSerializer, UserSerializer, FeedbackSerializer, AppointmentSerializer, DogWalkerSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, status
-from .models import MyModel, User
+from .models import MyModel, User, DogWalker, Feedback, Appointment
 
 from datetime import datetime, timedelta
 import jwt
@@ -69,6 +69,24 @@ class UserView(APIView):
         
         return Response(serializer.data)
     
+class UsersView(APIView):
+    def get(self, request):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+            raise AuthenticationFailed("Unauthenticated!")
+        
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+            
+        user = User.objects.all()
+        serializer = UserSerializer(user,many=True)
+        
+        return Response(serializer.data)
+
+
 class LogoutView(APIView):
     def post(self, request):
         response = Response()
@@ -78,6 +96,7 @@ class LogoutView(APIView):
         }
         
         return response
+
 
 class AddUserImageView(APIView):
 
@@ -104,3 +123,132 @@ class AddUserImageView(APIView):
 
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class DogWalkerView(APIView):
+    def get(self, request):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+          raise AuthenticationFailed("Unauthenticated!")
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+         
+        try:
+            dog_walker = DogWalker.objects.get(id=payload['id'])
+            serializer = DogWalkerSerializer(dog_walker)
+            appointments = dog_walker.appointments.all()
+            feedbacks = dog_walker.feedbacks.all()
+            return Response({'dog_walker': serializer.data, 'appointments': AppointmentSerializer(appointments, many=True).data, 'feedbacks': FeedbackSerializer(feedbacks, many=True).data})
+        except DogWalker.DoesNotExist:
+            return Response(status=404)
+
+    def post(self, request):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+            raise AuthenticationFailed("Unauthenticated!")
+        
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        serializer = DogWalkerSerializer(data=request.data)
+        if serializer.is_valid():
+            user = User.objects.filter(id=payload['id']).first()
+            serializer.save(user=user)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+
+class DogWalkersView(APIView):
+    def get(self, request):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+          raise AuthenticationFailed("Unauthenticated!")
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+         
+        try:
+            dog_walkers = DogWalker.objects.all()
+            serializer = DogWalkerSerializer(dog_walkers, many=True)
+            return Response(serializer.data)
+        except DogWalker.DoesNotExist:
+            return Response(status=404)
+
+
+class AppointmentView(APIView):
+    def get(self, request, pk):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+          raise AuthenticationFailed("Unauthenticated!")
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+    
+        appointments = Appointment.objects.filter(dogWalker__user=pk)
+        serializer = AppointmentSerializer(appointments, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, pk):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+          raise AuthenticationFailed("Unauthenticated!")
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+        
+        date = request.data.get('date')
+        date_parsed = datetime.fromisoformat(date) #TOCHECK AGAIN  {"date" : "2023-05-10T10:00:00Z"} to long for input
+        dogOwner = User.objects.get(id=payload['id'])
+        dogWalker= DogWalker.objects.get(id=pk)
+                
+        serializer = AppointmentSerializer(data=request.data)
+        print(serializer)
+        if serializer.is_valid():
+            serializer.save(dogOwner=dogOwner, dogWalker=dogWalker, date=date_parsed)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+
+class FeedbackView(APIView):
+    def get(self, request, pk):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+          raise AuthenticationFailed("Unauthenticated!")
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        feedbacks = Feedback.objects.filter(dogWalker__user=pk)
+        serializer = FeedbackSerializer(feedbacks, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, pk):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+          raise AuthenticationFailed("Unauthenticated!")
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+        dogOwnerr = User.objects.get(id=payload['id'])
+        dogWalkerr= DogWalker.objects.get(id=pk)
+        serializer = FeedbackSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(dogOwner=dogOwnerr, dogWalker=dogWalkerr)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)

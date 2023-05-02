@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MyModel, User
+from .models import MyModel, User, DogWalker, Feedback, Appointment
 
 class MyModelSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,4 +23,22 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         
         return instance
-            
+
+
+
+class DogWalkerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DogWalker
+        fields = ['id']
+
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = ['date']
+
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = '_all_'
