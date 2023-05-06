@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MyModel, User
+from .models import *
 
 class MyModelSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,4 +23,9 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         
         return instance
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = '__all__'
             

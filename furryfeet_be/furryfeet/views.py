@@ -1,9 +1,10 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import AuthenticationFailed
-from .serializers import MyModelSerializer, UserSerializer
+from .serializers import *
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, status
-from .models import MyModel, User
+from .models import *
 
 from datetime import datetime, timedelta
 import jwt
@@ -103,4 +104,71 @@ class AddUserImageView(APIView):
         user.save()
 
         serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+#FeedbackListView
+class FeedbackListView(APIView):
+    def get(self, request):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        feedbacks = Feedback.objects.all()
+        serializer = FeedbackSerializer(feedbacks, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class FeedbackCreateView(APIView):
+    def post(self, request):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        # get the user who is posting the feedback
+        user_from = User.objects.get(id=payload['id'])
+
+        # get the user who is receiving the feedback
+        user_to_id = request.data.get('user_to')
+        user_to = User.objects.get(id=user_to_id)
+
+        # create the feedback object
+        feedback = Feedback(
+            rating=request.data.get('rating'),
+            comment=request.data.get('comment'),
+            user_from=user_from,
+            user_to=user_to
+        )
+        feedback.save()
+
+        serializer = FeedbackSerializer(feedback)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class FeedbackDetailView(APIView):
+    def get(self, request, feedback_id):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        feedback = Feedback.objects.get(pk=feedback_id)
+        serializer = FeedbackSerializer(feedback)
+
         return Response(serializer.data, status=status.HTTP_200_OK)

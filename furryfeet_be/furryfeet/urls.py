@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import HelloWorld, LoginView, LogoutView, MyModelList, RegisterView, UserView, AddUserImageView
+from .views import *
 
 urlpatterns = [
     path('hello/', HelloWorld.as_view()),
@@ -10,4 +10,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view()),
     path('user/', UserView.as_view()),
     path('user/<int:pk>/image/', AddUserImageView.as_view()),
+    path('allfeedbacks/',FeedbackListView.as_view()),
+    path('createfeedback/',FeedbackCreateView.as_view()),
+    path('feedback/<int:feedback_id>/',FeedbackDetailView.as_view())
 ]
