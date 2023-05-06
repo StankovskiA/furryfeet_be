@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import HelloWorld, LoginView, LogoutView, MyModelList, RegisterView, UserView, AddUserImageView, GetAllDogsView, DogCreateView,GetDogView, User_GetDogsView, User_GetDogView, DogDeleteView, DogUpdateView, User_DogDeleteView, User_DogUpdateView, GetAllDogsFeedBacksView, GetDogFeedbacksView,CreateDogFeedbackView,GetFeedbacksFromDogWalkerView
+from .views import HelloWorld, LoginView, LogoutView, MyModelList, RegisterView, UserView, AddUserImageView, GetAllDogsView, DogCreateView,GetDogView, User_GetDogsView, User_GetDogView, DogDeleteView, DogUpdateView, User_DogDeleteView, User_DogUpdateView, GetAllDogsFeedBacksView, GetDogFeedbacksView,CreateDogFeedbackView,GetFeedbacksFromDogWalkerView, User_DogCreateView
+
 
 urlpatterns = [
     path('hello/', HelloWorld.as_view()),
@@ -13,6 +14,7 @@ urlpatterns = [
     path('dog/all-dogs/', GetAllDogsView.as_view()), #for getting all dogs from the database
     path('dog/my-dogs/', User_GetDogsView.as_view()), #for getting all dogs of the currently logged in user
     path('dog/create-dog/', DogCreateView.as_view()), #for creating a dog object
+    path('dog/create-my-dog/', User_DogCreateView.as_view()), #for creating a dog object with onwer being currently logged in user
     path('dog/get-dog/<int:pk>', GetDogView.as_view()), #for getting a dog object based on id
     path('dog/my-dog/<int:pk>', User_GetDogView.as_view()), #for getting currently logged-in user's dog based on id from query string
     path('dog/<int:pk>/delete-dog/', DogDeleteView.as_view()), #for deleting the dog with id

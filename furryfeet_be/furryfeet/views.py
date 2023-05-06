@@ -196,9 +196,8 @@ class User_GetDogView(APIView):
 
         return Response(serialized_dog.data)
 
-
 # this view is used for creating dog object with owner being currently logged-in user
-class DogCreateView(APIView):
+class User_DogCreateView(APIView):
     def post(self, request):
         token = request.COOKIES.get("jwt")
 
@@ -210,11 +209,31 @@ class DogCreateView(APIView):
             raise AuthenticationFailed("Unauthenticated!")
 
         dogOwner = User.objects.get(id=payload["id"])
-        serializered_dog = DogSerializer(data=request.data)
+        serializered_dog = DogSerializer(data=request.data, partial=True)
         if serializered_dog.is_valid():
             serializered_dog.save(owner=dogOwner)
             return Response(serializered_dog.data, status=201)
         return Response(serializered_dog.errors, status=400)
+
+
+# this view is used for creating dog object
+class DogCreateView(APIView):
+    def post(self, request):
+        token = request.COOKIES.get("jwt")
+
+        if not token:
+            raise AuthenticationFailed("Unauthenticated!")
+        try:
+            payload = jwt.decode(token, "secret", algorithms=["HS256"])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+        
+        serializered_dog = DogSerializer(data=request.data)
+        if serializered_dog.is_valid():
+            serializered_dog.save()
+            return Response(serializered_dog.data, status=201)
+        return Response(serializered_dog.errors, status=400)
+
 
 
 # This view is used for deleting the dog from the database with given id
