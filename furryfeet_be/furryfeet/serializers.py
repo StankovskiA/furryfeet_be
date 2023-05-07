@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MyModel, User
+from .models import MyModel, User, Dog, DogFeedback
 
 class MyModelSerializer(serializers.ModelSerializer):
     class Meta:
@@ -9,7 +9,7 @@ class MyModelSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'email', 'password', 'image']
+        fields = ['id', 'first_name', 'last_name', 'email', 'password', 'image', 'is_dog_walker']
         extra_kwargs = {
             'password': {'write_only': True}    
         }
@@ -23,4 +23,16 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         
         return instance
+    
+class DogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Dog
+        fields = ('id', 'name', 'breed', 'age', 'tag', 'photo', 'owner')
+        read_only_fields = ('id',)
+
+class DogFeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DogFeedback
+        fields = ['id', 'rating', 'comment', 'dog_walker', 'dog']
+        read_only_fields = ['id']
             
