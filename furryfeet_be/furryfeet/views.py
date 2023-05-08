@@ -649,7 +649,6 @@ class DeleteFeedbackView(APIView):
         except Feedback.DoesNotExist:
             return Response({"error": "Invalid feedback ID."}, status=status.HTTP_400_BAD_REQUEST)
 
-
         if not user.is_dog_walker and feedback.dog_owner != user:
             return Response(
                 {"error": "Current user is not authorized to delete this feedback."},
