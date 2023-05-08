@@ -1,12 +1,9 @@
 from django.urls import path
 from .views import *
-from .views import HelloWorld, LoginView, LogoutView, MyModelList, RegisterView, UserView, AddUserImageView, GetAllDogsView, DogCreateView,GetDogView, User_GetDogsView, User_GetDogView, DogDeleteView, DogUpdateView, User_DogDeleteView, User_DogUpdateView, GetAllDogsFeedBacksView, GetDogFeedbacksView,CreateDogFeedbackView,GetFeedbacksFromDogWalkerView, User_DogCreateView
-
 
 urlpatterns = [
     path('hello/', HelloWorld.as_view()),
     path('mymodels/', MyModelList.as_view()),
-    
     path('register/', RegisterView.as_view()),
     path('login/', LoginView.as_view()),
     path('logout/', LogoutView.as_view()),
@@ -14,7 +11,12 @@ urlpatterns = [
     path('user/<int:pk>/image/', AddUserImageView.as_view()),
     path('allfeedbacks/',FeedbackListView.as_view()),
     path('createfeedback/',FeedbackCreateView.as_view()),
-    path('feedback/<int:feedback_id>/',FeedbackDetailView.as_view())
+    path('feedback/<int:feedback_id>/',FeedbackDetailView.as_view()),
+    path('appointment/create/',AppointmentCreateView.as_view()),#creating an appointment object
+    path('appointment/listall/',AppointmentListView.as_view()), #get all appointments for the logged in dog walker
+    path('appointment/my/<int:appointment_id>/',AppointmentDetailView.as_view()), #get specific appointment based on the current logged in user
+    path('deleteappointment/my/<int:appointment_id>/',AppointmentDeleteView.as_view()),#delete a specific appointment for a user logged in
+    path('deletefeedback/my/<int:feedback_id>/',DeleteFeedbackView.as_view()),#delete a specific feedback for a user logged in
     path('dog/all-dogs/', GetAllDogsView.as_view()), #for getting all dogs from the database
     path('dog/my-dogs/', User_GetDogsView.as_view()), #for getting all dogs of the currently logged in user
     path('dog/create-dog/', DogCreateView.as_view()), #for creating a dog object

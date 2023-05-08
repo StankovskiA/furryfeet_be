@@ -6,7 +6,8 @@ class MyModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = MyModel
         fields = '__all__'
-        
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -25,11 +26,13 @@ class UserSerializer(serializers.ModelSerializer):
         
         return instance
 
+
 class DogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dog
         fields = ('id', 'name', 'breed', 'age', 'tag', 'photo', 'owner')
         read_only_fields = ('id',)
+
 
 class DogFeedbackSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,7 +40,14 @@ class DogFeedbackSerializer(serializers.ModelSerializer):
         fields = ['id', 'rating', 'comment', 'dog_walker', 'dog']
         read_only_fields = ['id']
 
+
 class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feedback
+        fields = '__all__'
+
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
         fields = '__all__'
