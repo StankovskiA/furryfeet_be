@@ -9,14 +9,14 @@ urlpatterns = [
     path('logout/', LogoutView.as_view()),
     path('user/', UserView.as_view()),
     path('user/<int:pk>/image/', AddUserImageView.as_view()),
-    path('allfeedbacks/', FeedbackListView.as_view()),
-    path('createfeedback/', FeedbackCreateView.as_view()),
-    path('feedback/<int:feedback_id>/', FeedbackDetailView.as_view()),
-    path('appointment/create/', AppointmentCreateView.as_view()),  # creating an appointment object
-    path('appointment/listall/', AppointmentListView.as_view()),  # get all appointments for the logged in dog walker
-    path('appointment/my/<int:appointment_id>/', AppointmentDetailView.as_view()),# get specific appointment based on the current logged in user
-    path('deleteappointment/my/<int:appointment_id>/', AppointmentDeleteView.as_view()),# delete a specific appointment for a user logged in
-    path('deletefeedback/my/<int:feedback_id>/', DeleteFeedbackView.as_view()),# delete a specific feedback for a user logged in
+    path('feedback/all-feedbacks/', FeedbackListView.as_view()), #listing all feedbacks
+    path('feedback/create-feedback/', FeedbackCreateView.as_view()), #creating a feedback
+    path('feedback/get-feedback/<int:feedback_id>/', FeedbackDetailView.as_view()), #getting a specific feedback
+    path('feedback/<int:feedback_id>/delete-my-feedback/', DeleteFeedbackView.as_view()),# delete a specific feedback for a user logged in
+    path('appointment/create-appointment/', AppointmentCreateView.as_view()),  # creating an appointment object
+    path('appointment/all-appointments/', AppointmentListView.as_view()),  # get all appointments for the logged in dog walker
+    path('appointment/get-appointment/<int:appointment_id>/', AppointmentDetailView.as_view()),# get specific appointment based on the current logged in user
+    path('appointment/<int:appointment_id>/delete-appointment/', AppointmentDeleteView.as_view()),# delete a specific appointment for a user logged in
     path('dog/all-dogs/', GetAllDogsView.as_view()),  # for getting all dogs from the database
     path('dog/my-dogs/', User_GetDogsView.as_view()),  # for getting all dogs of the currently logged in user
     path('dog/create-dog/', DogCreateView.as_view()),  # for creating a dog object

@@ -509,12 +509,12 @@ class FeedbackDetailView(APIView):
 
 class AppointmentCreateView(APIView):
     def post(self, request):
+        iso_format = '%Y-%m-%d %H:%M:%S.%f'
         # get the JWT token from the request
         token = request.COOKIES.get('jwt')
 
         if not token:
             raise AuthenticationFailed('Unauthenticated!')
-
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
@@ -522,8 +522,6 @@ class AppointmentCreateView(APIView):
 
         # get the dog walker id from request data
         dog_walker_id = request.data.get('dog_walker')
-
-        iso_format = '%Y-%m-%d %H:%M:%S.%f'
 
         # check if the user is a dog walker
         try:
@@ -557,9 +555,6 @@ class AppointmentCreateView(APIView):
         # serialize the appointment object and return the response
         serializer = AppointmentSerializer(appointment)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-
 
 class AppointmentListView(APIView):
     def get(self, request):
