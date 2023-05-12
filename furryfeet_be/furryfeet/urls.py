@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import HelloWorld, LoginView, LogoutView, MyModelList, RegisterView, UserView, AddUserImageView, GetAllDogsView, DogCreateView,GetDogView, User_GetDogsView, User_GetDogView, DogDeleteView, DogUpdateView, User_DogDeleteView, User_DogUpdateView, GetAllDogsFeedBacksView, GetDogFeedbacksView,CreateDogFeedbackView,GetFeedbacksFromDogWalkerView, User_DogCreateView
+from .views import HelloWorld, LoginView, LogoutView, MyModelList, RegisterView, UserView, AddUserImageView, GetAllDogsView, DogCreateView,GetDogView, User_GetDogsView, User_GetDogView, DogDeleteView, DogUpdateView, User_DogDeleteView, User_DogUpdateView, GetAllDogsFeedBacksView, GetDogFeedbacksView,CreateDogFeedbackView,GetFeedbacksFromDogWalkerView, User_DogCreateView, ChangeUserPasswordView
 
 
 urlpatterns = [
@@ -10,6 +10,7 @@ urlpatterns = [
     path('login/', LoginView.as_view()),
     path('logout/', LogoutView.as_view()),
     path('user/', UserView.as_view()),
+    path('user/change-password/', ChangeUserPasswordView.as_view()), #password change for the currently logged in user
     path('user/<int:pk>/image/', AddUserImageView.as_view()),
     path('dog/all-dogs/', GetAllDogsView.as_view()), #for getting all dogs from the database
     path('dog/my-dogs/', User_GetDogsView.as_view()), #for getting all dogs of the currently logged in user
