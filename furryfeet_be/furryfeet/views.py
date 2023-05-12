@@ -97,8 +97,6 @@ class ChangeUserPasswordView(APIView):
         new_password1 = request.data["new_password1"]
         new_password2 = request.data["new_password2"]
         
-        print(current_password)
-        
         # Verify the current password
         if not user.check_password(current_password):
             
@@ -125,7 +123,6 @@ def is_password_valid(password):
     max_length = 20
     has_lowercase = re.search(r"[a-z]", password)
     has_digit = re.search(r"\d", password)
-    print(password)
 
     # check if password meets policy requirements
     if len(password) < min_length or len(password) > max_length:
