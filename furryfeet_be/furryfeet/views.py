@@ -1,9 +1,10 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import AuthenticationFailed
-from .serializers import MyModelSerializer, UserSerializer, DogSerializer, DogFeedbackSerializer
+from .serializers import *
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, status
-from .models import MyModel, User, Dog, DogFeedback
+from .models import *
 
 from datetime import datetime, timedelta
 import jwt
@@ -437,3 +438,216 @@ class CreateDogFeedbackView(APIView):
             serializer.save(dog_walker=user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+#FeedbackListView
+class FeedbackListView(APIView):
+    def get(self, request):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        feedbacks = Feedback.objects.all()
+        serializer = FeedbackSerializer(feedbacks, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class FeedbackCreateView(APIView):
+    def post(self, request):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        # get the user who is posting the feedback
+        user_from = User.objects.get(id=payload['id'])
+
+        # get the user who is receiving the feedback
+        user_to_id = request.data.get('user_to')
+        user_to = User.objects.get(id=user_to_id)
+
+        # create the feedback object
+        feedback = Feedback(
+            rating=request.data.get('rating'),
+            comment=request.data.get('comment'),
+            user_from=user_from,
+            user_to=user_to
+        )
+        feedback.save()
+
+        serializer = FeedbackSerializer(feedback)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class FeedbackDetailView(APIView):
+    def get(self, request, feedback_id):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        feedback = Feedback.objects.get(pk=feedback_id)
+        serializer = FeedbackSerializer(feedback)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class AppointmentCreateView(APIView):
+    def post(self, request):
+        iso_format = '%Y-%m-%d %H:%M:%S.%f'
+        # get the JWT token from the request
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+            raise AuthenticationFailed('Unauthenticated!')
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated!')
+
+        # get the dog walker id from request data
+        dog_walker_id = request.data.get('dog_walker')
+
+        # check if the user is a dog walker
+        try:
+            dog_walker = User.objects.get(id=dog_walker_id, is_dog_walker=True)
+        except User.DoesNotExist:
+            return Response({'error': 'Invalid dog walker ID or user is not a dog walker.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # get the dog id from request data
+        dog_id = request.data.get('dog')
+
+        # check if the dog exists
+        try:
+            dog = Dog.objects.get(id=dog_id)
+        except Dog.DoesNotExist:
+            return Response({'error': 'Invalid dog ID.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # get the appointment date from request data
+        date_str = request.data.get('date')
+        try:
+            date = datetime.strptime(date_str, iso_format)
+        except ValueError:
+            return Response({'error': 'Invalid date format. Please use ISO format.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # create the appointment object
+        appointment = Appointment.objects.create(
+            dog_walker=dog_walker,
+            dog=dog,
+            date=date,
+        )
+
+        # serialize the appointment object and return the response
+        serializer = AppointmentSerializer(appointment)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class AppointmentListView(APIView):
+    def get(self, request):
+        token = request.COOKIES.get("jwt")
+
+        if not token:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        try:
+            payload = jwt.decode(token, "secret", algorithms=["HS256"])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        user = User.objects.get(id=payload["id"])
+
+        if not user.is_dog_walker:
+            return Response({"error": "Current user is not a dog walker."}, status=status.HTTP_403_FORBIDDEN)
+
+        appointments = Appointment.objects.filter(dog_walker=user).all()
+        serializer = AppointmentSerializer(appointments, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class AppointmentDetailView(APIView):
+    def get(self, request, appointment_id):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+            raise AuthenticationFailed('Unauthenticated!')
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated!')
+
+        try:
+            appointment = Appointment.objects.get(id=appointment_id)
+        except Appointment.DoesNotExist:
+            return Response({'error': 'Invalid appointment ID.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if appointment.dog_walker.id != payload['id']:
+            return Response({'error': 'Unauthorized to view this appointment.'}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = AppointmentSerializer(appointment)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class AppointmentDeleteView(APIView):
+    def delete(self, request, appointment_id):
+        token = request.COOKIES.get('jwt')
+        if not token:
+            raise AuthenticationFailed('Unauthenticated')
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated')
+
+        appointment = get_object_or_404(Appointment, pk=appointment_id)
+
+        # Only allow the dog walker who created the appointment to delete it
+        if appointment.dog_walker.id != payload['id']:
+            return Response({'error': 'You do not have permission to delete this appointment'},
+                            status=status.HTTP_403_FORBIDDEN)
+
+        appointment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DeleteFeedbackView(APIView):
+    def delete(self, request, feedback_id):
+        token = request.COOKIES.get("jwt")
+
+        if not token:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        try:
+            payload = jwt.decode(token, "secret", algorithms=["HS256"])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        user = User.objects.get(id=payload["id"])
+        try:
+            feedback = Feedback.objects.get(id=feedback_id)
+        except Feedback.DoesNotExist:
+            return Response({"error": "Invalid feedback ID."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not user.is_dog_walker and feedback.dog_owner != user:
+            return Response(
+                {"error": "Current user is not authorized to delete this feedback."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        feedback.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

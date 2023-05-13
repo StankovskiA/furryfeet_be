@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MyModel, User, Dog, DogFeedback
+from .models import *
 
 class MyModelSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,4 +35,15 @@ class DogFeedbackSerializer(serializers.ModelSerializer):
         model = DogFeedback
         fields = ['id', 'rating', 'comment', 'dog_walker', 'dog']
         read_only_fields = ['id']
-            
+
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = '__all__'
+
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = '__all__'
