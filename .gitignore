@@ -47,4 +47,8 @@ build/
 # User-generated media files -- not sure if we need this?
 media/
 
+# ignore database file
 db.sqlite3
+
+# ignore migrations
+**/migrations/
