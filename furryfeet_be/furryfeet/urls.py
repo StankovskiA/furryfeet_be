@@ -8,6 +8,7 @@ urlpatterns = [
     path('login/', LoginView.as_view()),
     path('logout/', LogoutView.as_view()),
     path('user/', UserView.as_view()),
+    path('user/change-password/', ChangeUserPasswordView.as_view()), #password change for the currently logged in user
     path('user/<int:pk>/image/', AddUserImageView.as_view()),
     path('feedback/all-feedbacks/', FeedbackListView.as_view()), #listing all feedbacks
     path('feedback/create-feedback/', FeedbackCreateView.as_view()), #creating a feedback

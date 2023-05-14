@@ -1,9 +1,11 @@
-from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import AuthenticationFailed
-from .serializers import *
+from django.contrib.auth import update_session_auth_hash
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework import generics, status
+from rest_framework.views import APIView
+from .methods import is_password_valid
+from .serializers import *
 from .models import *
 
 from datetime import datetime, timedelta
@@ -79,6 +81,42 @@ class LogoutView(APIView):
         }
         
         return response
+
+class ChangeUserPasswordView(APIView):
+    def post(self, request):
+        token = request.COOKIES.get('jwt')
+        
+        if not token:
+            raise AuthenticationFailed("Unauthenticated!")
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+        
+        user = User.objects.get(id=payload['id'])
+        current_password = request.data["current_password"]
+        new_password1 = request.data["new_password1"]
+        new_password2 = request.data["new_password2"]
+        
+        # Verify the current password
+        if not user.check_password(current_password):
+            
+            return Response({"error": "Incorrect current password"}, status=400)
+        
+        # Verify that the new passwords match
+        if new_password1 != new_password2:
+            return Response({"error": "New passwords do not match"}, status=400)
+        
+        # Verify that the new password meets the policy requirements
+        if not is_password_valid(new_password1):
+            return Response({"error": "New password does not meet the policy requirements"}, status=400)
+        
+        # Change the user's password and update the session
+        user.set_password(new_password1)
+        user.save()
+        update_session_auth_hash(request, user)
+        
+        return Response({"message": "Password successfully changed"})
 
 class AddUserImageView(APIView):
 
