@@ -1,11 +1,11 @@
-from django.shortcuts import get_object_or_404
-import re
-from django.contrib.auth import get_user_model, update_session_auth_hash
 from rest_framework.exceptions import AuthenticationFailed
-from .serializers import *
+from django.contrib.auth import update_session_auth_hash
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework import generics, status
+from rest_framework.views import APIView
+from .methods import is_password_valid
+from .serializers import *
 from .models import *
 
 from datetime import datetime, timedelta
@@ -117,21 +117,6 @@ class ChangeUserPasswordView(APIView):
         update_session_auth_hash(request, user)
         
         return Response({"message": "Password successfully changed"})
-
-def is_password_valid(password):
-    # define password policy
-    min_length = 8
-    max_length = 20
-    has_lowercase = re.search(r"[a-z]", password)
-    has_digit = re.search(r"\d", password)
-
-    # check if password meets policy requirements
-    if len(password) < min_length or len(password) > max_length:
-        return False
-    if not has_lowercase or not has_digit:
-        return False
-
-    return True
 
 class AddUserImageView(APIView):
 
