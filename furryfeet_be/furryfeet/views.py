@@ -57,7 +57,7 @@ class LoginView(APIView):
 
 class UserView(APIView):
     def get(self, request):
-        token = request.COOKIES.get('jwt')
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -84,7 +84,7 @@ class LogoutView(APIView):
 
 class ChangeUserPasswordView(APIView):
     def post(self, request):
-        token = request.COOKIES.get('jwt')
+        token = request.data['jwt']
         
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -121,7 +121,7 @@ class ChangeUserPasswordView(APIView):
 class AddUserImageView(APIView):
 
     def post(self, request, pk):
-        token = request.COOKIES.get('jwt')
+        token = request.data['jwt']
 
         if not token:
           raise AuthenticationFailed("Unauthenticated!")
@@ -147,7 +147,7 @@ class AddUserImageView(APIView):
 # This view is used for getting all dogs from the database
 class GetAllDogsView(APIView):
     def get(self, request):
-        token = request.COOKIES.get("jwt")
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -169,7 +169,7 @@ class GetAllDogsView(APIView):
 # This view is used for getting single dog object based on id from query string
 class GetDogView(APIView):
     def get(self, request, pk):
-        token = request.COOKIES.get("jwt")
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -192,7 +192,7 @@ class GetDogView(APIView):
 # This view is used for getting currently logged in user's all dogs
 class User_GetDogsView(APIView):
     def get(self, request):
-        token = request.COOKIES.get("jwt")
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -215,7 +215,7 @@ class User_GetDogsView(APIView):
 # This view is used for getting currently logged-in user's dog based on id from query string
 class User_GetDogView(APIView):
     def get(self, request, pk):
-        token = request.COOKIES.get("jwt")
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -238,7 +238,7 @@ class User_GetDogView(APIView):
 # this view is used for creating dog object with owner being currently logged-in user
 class User_DogCreateView(APIView):
     def post(self, request):
-        token = request.COOKIES.get("jwt")
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -258,7 +258,7 @@ class User_DogCreateView(APIView):
 # this view is used for creating dog object
 class DogCreateView(APIView):
     def post(self, request):
-        token = request.COOKIES.get("jwt")
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -278,7 +278,7 @@ class DogCreateView(APIView):
 # This view is used for deleting the dog from the database with given id
 class DogDeleteView(APIView):
     def delete(self, request, pk):
-        token = request.COOKIES.get("jwt")
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -303,7 +303,7 @@ class DogDeleteView(APIView):
 # This view is used for deleting a dog only if the currently logged in user is his/her owner
 class User_DogDeleteView(APIView):
     def delete(self, request, pk):
-        token = request.COOKIES.get("jwt")
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -330,7 +330,7 @@ class User_DogDeleteView(APIView):
 # This view is used for updating dog's details
 class DogUpdateView(APIView):
     def put(self, request, pk):
-        token = request.COOKIES.get("jwt")
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -358,7 +358,7 @@ class DogUpdateView(APIView):
 # This view is used for updating a dog only if the currently logged in user is his/her owner
 class User_DogUpdateView(APIView):
     def put(self, request, pk):
-        token = request.COOKIES.get("jwt")
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -386,7 +386,7 @@ class User_DogUpdateView(APIView):
 # This view is used for getting all dog feedbacks from all different dog walkers
 class GetAllDogsFeedBacksView(APIView):
     def get(self, request):
-        token = request.COOKIES.get("jwt")
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -408,7 +408,7 @@ class GetAllDogsFeedBacksView(APIView):
 # This view is used for getting single dog's all feedbacks recieved from different dogwalkers
 class GetDogFeedbacksView(APIView):
     def get(self, request, pk):
-        token = request.COOKIES.get("jwt")
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -431,7 +431,7 @@ class GetDogFeedbacksView(APIView):
 # This view is used for getting all feedbackts given to the dogs from a DogWalker
 class GetFeedbacksFromDogWalkerView(APIView):
     def get(self, request):
-        token = request.COOKIES.get("jwt")
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -454,7 +454,7 @@ class GetFeedbacksFromDogWalkerView(APIView):
 # This view is used to create a feedback for a dog if the currently logged in user is dogwalker (is_dog_walker=True)
 class CreateDogFeedbackView(APIView):
     def post(self, request):
-        token = request.COOKIES.get("jwt")
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -481,7 +481,7 @@ class CreateDogFeedbackView(APIView):
 #FeedbackListView
 class FeedbackListView(APIView):
     def get(self, request):
-        token = request.COOKIES.get('jwt')
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -499,7 +499,7 @@ class FeedbackListView(APIView):
 
 class FeedbackCreateView(APIView):
     def post(self, request):
-        token = request.COOKIES.get('jwt')
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -530,7 +530,7 @@ class FeedbackCreateView(APIView):
 
 class FeedbackDetailView(APIView):
     def get(self, request, feedback_id):
-        token = request.COOKIES.get('jwt')
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -549,7 +549,7 @@ class AppointmentCreateView(APIView):
     def post(self, request):
         iso_format = '%Y-%m-%d %H:%M:%S.%f'
         # get the JWT token from the request
-        token = request.COOKIES.get('jwt')
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed('Unauthenticated!')
@@ -596,7 +596,7 @@ class AppointmentCreateView(APIView):
 
 class AppointmentListView(APIView):
     def get(self, request):
-        token = request.COOKIES.get("jwt")
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -619,7 +619,7 @@ class AppointmentListView(APIView):
 
 class AppointmentDetailView(APIView):
     def get(self, request, appointment_id):
-        token = request.COOKIES.get('jwt')
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed('Unauthenticated!')
@@ -643,7 +643,7 @@ class AppointmentDetailView(APIView):
 
 class AppointmentDeleteView(APIView):
     def delete(self, request, appointment_id):
-        token = request.COOKIES.get('jwt')
+        token = request.data['jwt']
         if not token:
             raise AuthenticationFailed('Unauthenticated')
 
@@ -665,7 +665,7 @@ class AppointmentDeleteView(APIView):
 
 class DeleteFeedbackView(APIView):
     def delete(self, request, feedback_id):
-        token = request.COOKIES.get("jwt")
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
