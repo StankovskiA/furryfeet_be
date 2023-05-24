@@ -7,7 +7,7 @@ def is_password_valid(password):
     has_digit = re.search(r"\d", password)
 
     # check if password meets policy requirements
-    if len(password) in pw_length:
+    if len(password) not in pw_length:
         return False
     if not has_lowercase or not has_digit:
         return False
