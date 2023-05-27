@@ -75,6 +75,49 @@ class UserView(APIView):
         
         return Response(serializer.data)
     
+class GetAllDogWallkers(APIView):
+    def get(self, request):
+        token_header = request.headers.get('Authorization')
+        token_cookie = request.COOKIES.get('jwt')
+        token = token_header if token_header is not None else token_cookie
+        
+        if not token:
+            raise AuthenticationFailed("Unauthenticated!")
+        
+        token = token.split(' ')[1] if token.startswith('Bearer ') else token
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+        
+        dog_walkers = User.objects.filter(is_dog_walker=True)
+
+        serializer = UserSerializer(dog_walkers, many=True)
+        return Response(serializer.data)
+    
+class GetDogWallkerById(APIView):
+    def get(self, request, id):
+        token_header = request.headers.get('Authorization')
+        token_cookie = request.COOKIES.get('jwt')
+        token = token_header if token_header is not None else token_cookie
+
+        if not token:
+            raise AuthenticationFailed("Unauthenticated!")
+        
+        token = token.split(' ')[1] if token.startswith('Bearer ') else token
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Unauthenticated!")
+
+        try:
+            dog_walker = User.objects.get(id=id, is_dog_walker=True)
+        except User.DoesNotExist:
+            return Response({"error": "Dog walker not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = UserSerializer(dog_walker)
+        return Response(serializer.data)
+    
 class LogoutView(APIView):
     def post(self, request):
         response = Response()
