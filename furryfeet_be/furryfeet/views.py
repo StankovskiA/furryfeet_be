@@ -57,12 +57,14 @@ class LoginView(APIView):
 
 class UserView(APIView):
     def get(self, request):
-        token = request.headers.get('Authorization')
-
+        token_header = request.headers.get('Authorization')
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_header if token_header is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
-        token = token.split(' ')[1] if token.startswith('Bearer ') else token
         
+        token = token.split(' ')[1] if token.startswith('Bearer ') else token
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
@@ -85,10 +87,13 @@ class LogoutView(APIView):
 
 class ChangeUserPasswordView(APIView):
     def post(self, request):
-        token = request.data['jwt']
+        token_data = request.data['jwt']
+        token_cookie = request.COOKIES.get('jwt')
         
+        token = token_data if token_data is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
@@ -122,10 +127,13 @@ class ChangeUserPasswordView(APIView):
 class AddUserImageView(APIView):
 
     def post(self, request, pk):
-        token = request.data['jwt']
-
+        token_data = request.data['jwt']
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_data if token_data is not None else token_cookie
         if not token:
           raise AuthenticationFailed("Unauthenticated!")
+      
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
@@ -148,12 +156,14 @@ class AddUserImageView(APIView):
 # This view is used for getting all dogs from the database
 class GetAllDogsView(APIView):
     def get(self, request):
-        token = request.headers.get('Authorization')
-
+        token_header = request.headers.get('Authorization')
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_header if token_header is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")        
+        
         token = token.split(' ')[1] if token.startswith('Bearer ') else token
-
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -172,12 +182,14 @@ class GetAllDogsView(APIView):
 # This view is used for getting single dog object based on id from query string
 class GetDogView(APIView):
     def get(self, request, pk):
-        token = request.headers.get('Authorization')
-
+        token_header = request.headers.get('Authorization')
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_header if token_header is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        
         token = token.split(' ')[1] if token.startswith('Bearer ') else token
-
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -197,12 +209,14 @@ class GetDogView(APIView):
 # This view is used for getting currently logged in user's all dogs
 class User_GetDogsView(APIView):
     def get(self, request):
-        token = request.headers.get('Authorization')
-
+        token_header = request.headers.get('Authorization')
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_header if token_header is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        
         token = token.split(' ')[1] if token.startswith('Bearer ') else token
-
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -222,12 +236,14 @@ class User_GetDogsView(APIView):
 # This view is used for getting currently logged-in user's dog based on id from query string
 class User_GetDogView(APIView):
     def get(self, request, pk):
-        token = request.headers.get('Authorization')
-
+        token_header = request.headers.get('Authorization')
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_header if token_header is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        
         token = token.split(' ')[1] if token.startswith('Bearer ') else token
-
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -247,10 +263,13 @@ class User_GetDogView(APIView):
 # this view is used for creating dog object with owner being currently logged-in user
 class User_DogCreateView(APIView):
     def post(self, request):
-        token = request.data['jwt']
-
+        token_data = request.data['jwt']
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_data if token_data is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -267,10 +286,13 @@ class User_DogCreateView(APIView):
 # this view is used for creating dog object
 class DogCreateView(APIView):
     def post(self, request):
-        token = request.data['jwt']
-
+        token_data = request.data['jwt']
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_data if token_data is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -287,10 +309,13 @@ class DogCreateView(APIView):
 # This view is used for deleting the dog from the database with given id
 class DogDeleteView(APIView):
     def delete(self, request, pk):
-        token = request.data['jwt']
-
+        token_data = request.data['jwt']
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_data if token_data is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -312,8 +337,10 @@ class DogDeleteView(APIView):
 # This view is used for deleting a dog only if the currently logged in user is his/her owner
 class User_DogDeleteView(APIView):
     def delete(self, request, pk):
-        token = request.data['jwt']
-
+        token_data = request.data['jwt']
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_data if token_data is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
 
@@ -339,10 +366,13 @@ class User_DogDeleteView(APIView):
 # This view is used for updating dog's details
 class DogUpdateView(APIView):
     def put(self, request, pk):
-        token = request.data['jwt']
-
+        token_data = request.data['jwt']
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_data if token_data is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -351,9 +381,7 @@ class DogUpdateView(APIView):
         try:
             dog = Dog.objects.get(pk=pk)
         except Dog.DoesNotExist:
-            return Response(
-                {"message": "Dog not found"}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"message": "Dog not found"}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = DogSerializer(dog, data=request.data)
 
@@ -367,8 +395,10 @@ class DogUpdateView(APIView):
 # This view is used for updating a dog only if the currently logged in user is his/her owner
 class User_DogUpdateView(APIView):
     def put(self, request, pk):
-        token = request.data['jwt']
-
+        token_data = request.data['jwt']
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_data if token_data is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
 
@@ -395,10 +425,13 @@ class User_DogUpdateView(APIView):
 # This view is used for getting all dog feedbacks from all different dog walkers
 class GetAllDogsFeedBacksView(APIView):
     def get(self, request):
-        token = request.headers.get('Authorization')
-
+        token_header = request.headers.get('Authorization')
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_header if token_header is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        
         token = token.split(' ')[1] if token.startswith('Bearer ') else token
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
@@ -418,10 +451,13 @@ class GetAllDogsFeedBacksView(APIView):
 # This view is used for getting single dog's all feedbacks recieved from different dogwalkers
 class GetDogFeedbacksView(APIView):
     def get(self, request, pk):
-        token = request.headers.get('Authorization')
-
+        token_header = request.headers.get('Authorization')
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_header if token_header is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        
         token = token.split(' ')[1] if token.startswith('Bearer ') else token
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
@@ -442,10 +478,13 @@ class GetDogFeedbacksView(APIView):
 # This view is used for getting all feedbackts given to the dogs from a DogWalker
 class GetFeedbacksFromDogWalkerView(APIView):
     def get(self, request):
-        token = request.headers.get('Authorization')
-
+        token_header = request.headers.get('Authorization')
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_header if token_header is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        
         token = token.split(' ')[1] if token.startswith('Bearer ') else token
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
@@ -466,7 +505,10 @@ class GetFeedbacksFromDogWalkerView(APIView):
 # This view is used to create a feedback for a dog if the currently logged in user is dogwalker (is_dog_walker=True)
 class CreateDogFeedbackView(APIView):
     def post(self, request):
-        token = request.data['jwt']
+        token_data = request.data['jwt']
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_data if token_data is not None else token_cookie
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -493,10 +535,13 @@ class CreateDogFeedbackView(APIView):
 #FeedbackListView
 class FeedbackListView(APIView):
     def get(self, request):
-        token = request.headers.get('Authorization')
-
+        token_header = request.headers.get('Authorization')
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_header if token_header is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        
         token = token.split(' ')[1] if token.startswith('Bearer ') else token
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
@@ -511,8 +556,10 @@ class FeedbackListView(APIView):
 
 class FeedbackCreateView(APIView):
     def post(self, request):
-        token = request.data['jwt']
-
+        token_data = request.data['jwt']
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_data if token_data is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
 
@@ -542,10 +589,13 @@ class FeedbackCreateView(APIView):
 
 class FeedbackDetailView(APIView):
     def get(self, request, feedback_id):
-        token = request.headers.get('Authorization')
-
+        token_header = request.headers.get('Authorization')
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_header if token_header is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        
         token = token.split(' ')[1] if token.startswith('Bearer ') else token
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
@@ -560,11 +610,13 @@ class FeedbackDetailView(APIView):
 class AppointmentCreateView(APIView):
     def post(self, request):
         iso_format = '%Y-%m-%d %H:%M:%S.%f'
-        # get the JWT token from the request
-        token = request.data['jwt']
-
+        token_data = request.data['jwt']
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_data if token_data is not None else token_cookie
         if not token:
             raise AuthenticationFailed('Unauthenticated!')
+        
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
@@ -608,12 +660,13 @@ class AppointmentCreateView(APIView):
 
 class AppointmentListView(APIView):
     def get(self, request):
-        # token = request.data['jwt']
-        token = request.headers.get('Authorization')
-
-        print(token)
+        token_header = request.headers.get('Authorization')
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_header if token_header is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        
         token = token.split(' ')[1] if token.startswith('Bearer ') else token
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
@@ -633,10 +686,13 @@ class AppointmentListView(APIView):
 
 class AppointmentDetailView(APIView):
     def get(self, request, appointment_id):
-        token = request.headers.get('Authorization')
-
+        token_header = request.headers.get('Authorization')
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_header if token_header is not None else token_cookie
         if not token:
             raise AuthenticationFailed('Unauthenticated!')
+        
         token = token.split(' ')[1] if token.startswith('Bearer ') else token
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
@@ -657,7 +713,10 @@ class AppointmentDetailView(APIView):
 
 class AppointmentDeleteView(APIView):
     def delete(self, request, appointment_id):
-        token = request.data['jwt']
+        token_data = request.data['jwt']
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_data if token_data is not None else token_cookie
         if not token:
             raise AuthenticationFailed('Unauthenticated')
 
@@ -679,8 +738,10 @@ class AppointmentDeleteView(APIView):
 
 class DeleteFeedbackView(APIView):
     def delete(self, request, feedback_id):
-        token = request.data['jwt']
-
+        token_data = request.data['jwt']
+        token_cookie = request.COOKIES.get('jwt')
+        
+        token = token_data if token_data is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
 
