@@ -57,10 +57,11 @@ class LoginView(APIView):
 
 class UserView(APIView):
     def get(self, request):
-        token = request.data['jwt']
+        token = request.headers.get('Authorization')
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        token = token.split(' ')[1] if token.startswith('Bearer ') else token
         
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
@@ -147,10 +148,12 @@ class AddUserImageView(APIView):
 # This view is used for getting all dogs from the database
 class GetAllDogsView(APIView):
     def get(self, request):
-        token = request.data['jwt']
+        token = request.headers.get('Authorization')
 
         if not token:
-            raise AuthenticationFailed("Unauthenticated!")
+            raise AuthenticationFailed("Unauthenticated!")        
+        token = token.split(' ')[1] if token.startswith('Bearer ') else token
+
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -169,10 +172,12 @@ class GetAllDogsView(APIView):
 # This view is used for getting single dog object based on id from query string
 class GetDogView(APIView):
     def get(self, request, pk):
-        token = request.data['jwt']
+        token = request.headers.get('Authorization')
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        token = token.split(' ')[1] if token.startswith('Bearer ') else token
+
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -192,10 +197,12 @@ class GetDogView(APIView):
 # This view is used for getting currently logged in user's all dogs
 class User_GetDogsView(APIView):
     def get(self, request):
-        token = request.data['jwt']
+        token = request.headers.get('Authorization')
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        token = token.split(' ')[1] if token.startswith('Bearer ') else token
+
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -215,10 +222,12 @@ class User_GetDogsView(APIView):
 # This view is used for getting currently logged-in user's dog based on id from query string
 class User_GetDogView(APIView):
     def get(self, request, pk):
-        token = request.data['jwt']
+        token = request.headers.get('Authorization')
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        token = token.split(' ')[1] if token.startswith('Bearer ') else token
+
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -386,10 +395,11 @@ class User_DogUpdateView(APIView):
 # This view is used for getting all dog feedbacks from all different dog walkers
 class GetAllDogsFeedBacksView(APIView):
     def get(self, request):
-        token = request.data['jwt']
+        token = request.headers.get('Authorization')
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        token = token.split(' ')[1] if token.startswith('Bearer ') else token
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -408,10 +418,11 @@ class GetAllDogsFeedBacksView(APIView):
 # This view is used for getting single dog's all feedbacks recieved from different dogwalkers
 class GetDogFeedbacksView(APIView):
     def get(self, request, pk):
-        token = request.data['jwt']
+        token = request.headers.get('Authorization')
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        token = token.split(' ')[1] if token.startswith('Bearer ') else token
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -431,10 +442,11 @@ class GetDogFeedbacksView(APIView):
 # This view is used for getting all feedbackts given to the dogs from a DogWalker
 class GetFeedbacksFromDogWalkerView(APIView):
     def get(self, request):
-        token = request.data['jwt']
+        token = request.headers.get('Authorization')
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
+        token = token.split(' ')[1] if token.startswith('Bearer ') else token
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -481,11 +493,11 @@ class CreateDogFeedbackView(APIView):
 #FeedbackListView
 class FeedbackListView(APIView):
     def get(self, request):
-        token = request.data['jwt']
+        token = request.headers.get('Authorization')
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
-
+        token = token.split(' ')[1] if token.startswith('Bearer ') else token
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
@@ -530,11 +542,11 @@ class FeedbackCreateView(APIView):
 
 class FeedbackDetailView(APIView):
     def get(self, request, feedback_id):
-        token = request.data['jwt']
+        token = request.headers.get('Authorization')
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
-
+        token = token.split(' ')[1] if token.startswith('Bearer ') else token
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
@@ -596,11 +608,13 @@ class AppointmentCreateView(APIView):
 
 class AppointmentListView(APIView):
     def get(self, request):
-        token = request.data['jwt']
+        # token = request.data['jwt']
+        token = request.headers.get('Authorization')
 
+        print(token)
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
-
+        token = token.split(' ')[1] if token.startswith('Bearer ') else token
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -619,11 +633,11 @@ class AppointmentListView(APIView):
 
 class AppointmentDetailView(APIView):
     def get(self, request, appointment_id):
-        token = request.data['jwt']
+        token = request.headers.get('Authorization')
 
         if not token:
             raise AuthenticationFailed('Unauthenticated!')
-
+        token = token.split(' ')[1] if token.startswith('Bearer ') else token
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
