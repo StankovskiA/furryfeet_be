@@ -683,20 +683,29 @@ class AppointmentCreateView(APIView):
         except Dog.DoesNotExist:
             return Response({'error': 'Invalid dog ID.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # get the appointment date from request data
-        date_str = request.data.get('date')
-        try:
-            date = datetime.strptime(date_str, iso_format)
-        except ValueError:
-            return Response({'error': 'Invalid date format. Please use ISO format.'}, status=status.HTTP_400_BAD_REQUEST)
+        # get the requested time slot from request data
+        timeslot = request.data.get("timeslot")
+
+        # Check if the requested time slot is available
+        print(dog_walker.timeslots)
+        if timeslot not in dog_walker.timeslots:
+            return Response(
+                {"error": "Requested time slot is not available."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # create the appointment object
         appointment = Appointment.objects.create(
             dog_walker=dog_walker,
             dog=dog,
-            date=date,
+            date=datetime.now(),
+            timeslot=timeslot,
         )
-
+        
+        # Remove the requested time slot from the user's timeslots
+        dog_walker.timeslots.remove(timeslot)
+        dog_walker.save()
+        
         # serialize the appointment object and return the response
         serializer = AppointmentSerializer(appointment)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -745,10 +754,15 @@ class AppointmentDetailView(APIView):
         try:
             appointment = Appointment.objects.get(id=appointment_id)
         except Appointment.DoesNotExist:
-            return Response({'error': 'Invalid appointment ID.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Invalid appointment ID."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
-        if appointment.dog_walker.id != payload['id']:
-            return Response({'error': 'Unauthorized to view this appointment.'}, status=status.HTTP_403_FORBIDDEN)
+        if appointment.dog_walker.id != payload["id"]:
+            return Response(
+                {"error": "Unauthorized to view this appointment."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         serializer = AppointmentSerializer(appointment)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -756,24 +770,26 @@ class AppointmentDetailView(APIView):
 
 class AppointmentDeleteView(APIView):
     def delete(self, request, appointment_id):
-        token_data = request.data['jwt']
-        token_cookie = request.COOKIES.get('jwt')
-        
+        token_data = request.data["jwt"]
+        token_cookie = request.COOKIES.get("jwt")
+
         token = token_data if token_data is not None else token_cookie
         if not token:
-            raise AuthenticationFailed('Unauthenticated')
+            raise AuthenticationFailed("Unauthenticated")
 
         try:
-            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+            payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
-            raise AuthenticationFailed('Unauthenticated')
+            raise AuthenticationFailed("Unauthenticated")
 
         appointment = get_object_or_404(Appointment, pk=appointment_id)
 
         # Only allow the dog walker who created the appointment to delete it
-        if appointment.dog_walker.id != payload['id']:
-            return Response({'error': 'You do not have permission to delete this appointment'},
-                            status=status.HTTP_403_FORBIDDEN)
+        if appointment.dog_walker.id != payload["id"]:
+            return Response(
+                {"error": "You do not have permission to delete this appointment"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         appointment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -781,9 +797,9 @@ class AppointmentDeleteView(APIView):
 
 class DeleteFeedbackView(APIView):
     def delete(self, request, feedback_id):
-        token_data = request.data['jwt']
-        token_cookie = request.COOKIES.get('jwt')
-        
+        token_data = request.data["jwt"]
+        token_cookie = request.COOKIES.get("jwt")
+
         token = token_data if token_data is not None else token_cookie
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -797,7 +813,9 @@ class DeleteFeedbackView(APIView):
         try:
             feedback = Feedback.objects.get(id=feedback_id)
         except Feedback.DoesNotExist:
-            return Response({"error": "Invalid feedback ID."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Invalid feedback ID."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         if not user.is_dog_walker and feedback.dog_owner != user:
             return Response(

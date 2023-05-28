@@ -27,10 +27,27 @@ class User(AbstractUser):
     joined_at = models.DateTimeField(auto_now_add=True)
     image = models.URLField(null=True, blank=True)
     is_dog_walker = models.BooleanField(default=False)
+    timeslots = models.JSONField(default=list)
     username = None
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
+
+    def save(self, *args, **kwargs):
+        if not self.timeslots and self.is_dog_walker:
+            self.timeslots = self.generate_default_timeslots()
+        super().save(*args, **kwargs)
+
+    def generate_default_timeslots(self):
+        time_slots = []
+        start_hour = 9
+        end_hour = 14
+
+        for hour in range(start_hour, end_hour + 1):
+            time_slot = f"{hour}-{hour+1}"
+            time_slots.append(time_slot)
+
+        return time_slots
 
 
 class Feedback(models.Model):
@@ -79,3 +96,4 @@ class Appointment(models.Model):
         limit_choices_to={"is_dog_walker": True},
     )
     dog = models.ForeignKey(Dog, on_delete=models.CASCADE)
+    timeslot = models.CharField(max_length=10, default="None")
