@@ -770,7 +770,7 @@ class AppointmentDetailView(APIView):
 
 class AppointmentDeleteView(APIView):
     def delete(self, request, appointment_id):
-        token_data = request.data["jwt"]
+        token_data = request.data.get("jwt")
         token_cookie = request.COOKIES.get("jwt")
 
         token = token_data if token_data is not None else token_cookie
@@ -792,12 +792,12 @@ class AppointmentDeleteView(APIView):
             )
 
         appointment.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "Appointment deleted successfully"},status=status.HTTP_204_NO_CONTENT)
 
 
 class DeleteFeedbackView(APIView):
     def delete(self, request, feedback_id):
-        token_data = request.data["jwt"]
+        token_data = request.data.get("jwt")
         token_cookie = request.COOKIES.get("jwt")
 
         token = token_data if token_data is not None else token_cookie
@@ -824,4 +824,4 @@ class DeleteFeedbackView(APIView):
             )
 
         feedback.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "Feedback deleted successfully"},status=status.HTTP_204_NO_CONTENT)
