@@ -130,7 +130,7 @@ class LogoutView(APIView):
 
 class ChangeUserPasswordView(APIView):
     def post(self, request):
-        token_data = request.data['jwt']
+        token_data = request.data.get('jwt')
         token_cookie = request.COOKIES.get('jwt')
         
         token = token_data if token_data is not None else token_cookie
@@ -170,7 +170,7 @@ class ChangeUserPasswordView(APIView):
 class AddUserImageView(APIView):
 
     def post(self, request, pk):
-        token_data = request.data['jwt']
+        token_data = request.data.get('jwt')
         token_cookie = request.COOKIES.get('jwt')
         
         token = token_data if token_data is not None else token_cookie
@@ -306,7 +306,7 @@ class User_GetDogView(APIView):
 # this view is used for creating dog object with owner being currently logged-in user
 class User_DogCreateView(APIView):
     def post(self, request):
-        token_data = request.data['jwt']
+        token_data = request.data.get('jwt')
         token_cookie = request.COOKIES.get('jwt')
         
         token = token_data if token_data is not None else token_cookie
@@ -329,7 +329,7 @@ class User_DogCreateView(APIView):
 # this view is used for creating dog object
 class DogCreateView(APIView):
     def post(self, request):
-        token_data = request.data['jwt']
+        token_data = request.data.get('jwt')
         token_cookie = request.COOKIES.get('jwt')
         
         token = token_data if token_data is not None else token_cookie
@@ -352,7 +352,7 @@ class DogCreateView(APIView):
 # This view is used for deleting the dog from the database with given id
 class DogDeleteView(APIView):
     def delete(self, request, pk):
-        token_data = request.data['jwt']
+        token_data = request.data.get('jwt')
         token_cookie = request.COOKIES.get('jwt')
         
         token = token_data if token_data is not None else token_cookie
@@ -380,7 +380,7 @@ class DogDeleteView(APIView):
 # This view is used for deleting a dog only if the currently logged in user is his/her owner
 class User_DogDeleteView(APIView):
     def delete(self, request, pk):
-        token_data = request.data['jwt']
+        token_data = request.data.get('jwt')
         token_cookie = request.COOKIES.get('jwt')
         
         token = token_data if token_data is not None else token_cookie
@@ -409,7 +409,7 @@ class User_DogDeleteView(APIView):
 # This view is used for updating dog's details
 class DogUpdateView(APIView):
     def put(self, request, pk):
-        token_data = request.data['jwt']
+        token_data = request.data.get('jwt')
         token_cookie = request.COOKIES.get('jwt')
         
         token = token_data if token_data is not None else token_cookie
@@ -438,7 +438,7 @@ class DogUpdateView(APIView):
 # This view is used for updating a dog only if the currently logged in user is his/her owner
 class User_DogUpdateView(APIView):
     def put(self, request, pk):
-        token_data = request.data['jwt']
+        token_data = request.data.get('jwt')
         token_cookie = request.COOKIES.get('jwt')
         
         token = token_data if token_data is not None else token_cookie
@@ -548,7 +548,7 @@ class GetFeedbacksFromDogWalkerView(APIView):
 # This view is used to create a feedback for a dog if the currently logged in user is dogwalker (is_dog_walker=True)
 class CreateDogFeedbackView(APIView):
     def post(self, request):
-        token_data = request.data['jwt']
+        token_data = request.data.get('jwt')
         token_cookie = request.COOKIES.get('jwt')
         
         token = token_data if token_data is not None else token_cookie
@@ -599,7 +599,7 @@ class FeedbackListView(APIView):
 
 class FeedbackCreateView(APIView):
     def post(self, request):
-        token_data = request.data['jwt']
+        token_data = request.data.get('jwt')
         token_cookie = request.COOKIES.get('jwt')
         
         token = token_data if token_data is not None else token_cookie
@@ -653,7 +653,7 @@ class FeedbackDetailView(APIView):
 class AppointmentCreateView(APIView):
     def post(self, request):
         iso_format = '%Y-%m-%d %H:%M:%S.%f'
-        token_data = request.data['jwt']
+        token_data = request.data.get('jwt')
         token_cookie = request.COOKIES.get('jwt')
         
         token = token_data if token_data is not None else token_cookie
