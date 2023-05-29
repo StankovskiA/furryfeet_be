@@ -667,39 +667,21 @@ class AppointmentCreateView(APIView):
 
         # get the dog walker id from request data
         dog_walker_id = request.data.get('dog_walker')
-
+        user = User.objects.get(id=payload['id'])
         # check if the user is a dog walker
         try:
             dog_walker = User.objects.get(id=dog_walker_id, is_dog_walker=True)
         except User.DoesNotExist:
             return Response({'error': 'Invalid dog walker ID or user is not a dog walker.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # get the dog id from request data
-        dog_id = request.data.get('dog')
-
-        # check if the dog exists
-        try:
-            dog = Dog.objects.get(id=dog_id)
-        except Dog.DoesNotExist:
-            return Response({'error': 'Invalid dog ID.'}, status=status.HTTP_400_BAD_REQUEST)
-
         # get the requested time slot from request data
         timeslot = request.data.get("timeslot")
-
-        # Check if the requested time slot is available
-        print(dog_walker.timeslots)
-        if timeslot not in dog_walker.timeslots:
-            return Response(
-                {"error": "Requested time slot is not available."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
 
         # create the appointment object
         appointment = Appointment.objects.create(
             dog_walker=dog_walker,
-            dog=dog,
-            date=datetime.now(),
-            timeslot=timeslot,
+            dog_owner=user,
+            timeslot=timeslot
         )
         
         # Remove the requested time slot from the user's timeslots
@@ -724,8 +706,6 @@ class AppointmentListView(APIView):
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed("Unauthenticated!")
-
-        user = User.objects.get(id=payload["id"])
 
         appointments = Appointment.objects.all()
         serializer = AppointmentSerializer(appointments, many=True)

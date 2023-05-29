@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from .managers import UserManager
+
 RATING_CHOICES = (
     (1, "1"),
     (2, "2"),
@@ -29,6 +31,7 @@ class User(AbstractUser):
     is_dog_walker = models.BooleanField(default=False)
     timeslots = models.JSONField(default=list)
     username = None
+    objects = UserManager()
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -88,12 +91,15 @@ class DogFeedback(models.Model):
 
 
 class Appointment(models.Model):
-    date = models.DateTimeField()
     dog_walker = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name="appointments_owned",
         limit_choices_to={"is_dog_walker": True},
     )
-    dog = models.ForeignKey(Dog, on_delete=models.CASCADE)
+    dog_owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        limit_choices_to={"is_dog_walker": False},
+    )
     timeslot = models.CharField(max_length=10, default="None")
