@@ -17,7 +17,7 @@ urlpatterns = [
     path('feedback/get-feedback/<int:feedback_id>/', FeedbackDetailView.as_view()), #getting a specific feedback
     path('feedback/<int:feedback_id>/delete-my-feedback/', DeleteFeedbackView.as_view()),# delete a specific feedback for a user logged in
     path('appointment/create-appointment/', AppointmentCreateView.as_view()),  # creating an appointment object
-    path('appointment/all-appointments/', AppointmentListView.as_view()),  # get all appointments for the logged in dog walker
+    path('appointment/all-appointments/', AppointmentListView.as_view()),  # get all appointments
     path('appointment/get-appointment/<int:appointment_id>/', AppointmentDetailView.as_view()),# get specific appointment based on the current logged in user
     path('appointment/<int:appointment_id>/delete-appointment/', AppointmentDeleteView.as_view()),# delete a specific appointment for a user logged in
     path('dog/all-dogs/', GetAllDogsView.as_view()),  # for getting all dogs from the database

@@ -727,10 +727,7 @@ class AppointmentListView(APIView):
 
         user = User.objects.get(id=payload["id"])
 
-        if not user.is_dog_walker:
-            return Response({"error": "Current user is not a dog walker."}, status=status.HTTP_403_FORBIDDEN)
-
-        appointments = Appointment.objects.filter(dog_walker=user).all()
+        appointments = Appointment.objects.all()
         serializer = AppointmentSerializer(appointments, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
